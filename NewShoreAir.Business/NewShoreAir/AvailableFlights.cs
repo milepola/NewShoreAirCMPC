@@ -33,13 +33,18 @@ namespace NewShoreAir.Business.NewShoreAir
 
             try
             {
-                string FlightsNewShoreAir = await _srvRecruiting.GetFlightsNewShoreAir();
+                FlightRoute FlightRoute = _dalFlight.GetRouteExisting(Origin, Destination);
 
-                FlightRoute FlightRoute = await GetRouteFlight(FlightsNewShoreAir, Origin, Destination);
-
-                if (FlightRoute.Flights.Count > 0)
+                if (FlightRoute.Flights.Count == 0)
                 {
-                    _dalFlight.SaveRouteFlight(FlightRoute);
+                    string FlightsNewShoreAir = await _srvRecruiting.GetFlightsNewShoreAir();
+
+                    FlightRoute = await GetRouteFlight(FlightsNewShoreAir, Origin, Destination);
+
+                    if (FlightRoute.Flights.Count > 0)
+                    {
+                        _dalFlight.SaveRouteFlight(FlightRoute);
+                    }
                 }
                 return FlightRoute;
             }
@@ -49,6 +54,7 @@ namespace NewShoreAir.Business.NewShoreAir
 
             }
         }
+
         /// <summary>
         /// Obtiene todos los vuelos asociados a la solicitud
         /// </summary>

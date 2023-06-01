@@ -4,6 +4,10 @@ using System.Reflection;
 using Microsoft.Extensions.Options;
 using NewShoreAir.Models.Entities;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using System.Diagnostics;
+using System;
+
 namespace NewShoreAir.Dal
 {
     public class DalFlight
@@ -15,6 +19,71 @@ namespace NewShoreAir.Dal
             _stringConnection = @"Server=milepola\sqlexpress;Database=NewShoreAir;Uid=sa;Pwd=Passw0rd.";
 
         }
+        /// <summary>
+        /// Obtiene si la ruta ya se encuentra en bd
+        /// </summary>
+        /// <param name="Origin">Origen del vuelo</param>
+        /// <param name="Destination">Destino del vuelo</param>
+        /// <returns>bool</returns>
+        public FlightRoute GetRouteExisting(string Origin, string Destination)
+        {
+            MethodBase? Method = MethodBase.GetCurrentMethod();
+
+            try
+            {
+                string Query = "select J.Price AS PriceJ, F.Origin, F.Destination, F.Price, T.Carrier, T.NumberTr " +
+                "FROM Journey J " +
+                "INNER JOIN JourneyFlight JF ON JF.IdJourney = J.Id " +
+                "INNER JOIN Flight F ON F.Id = JF.IdFlight " +
+                "INNER JOIN Transport T ON T.Id = F.IdTransport " +
+                "WHERE J.Origin = '" + Origin + "' and J.Destination = '" + Destination + "' " +
+                "ORDER BY F.Id ";
+                Decimal PriceJ = 0;
+                using (SqlConnection connection = new SqlConnection(_stringConnection))
+                {
+                    connection.Open();
+
+                    using (SqlCommand command = new SqlCommand(Query, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            FlightRoute Journey = new FlightRoute();
+                            Journey.Flights = new List<Flight>();
+
+                            while (reader.Read())
+                            {
+                                Flight flight = new Flight
+                                {
+                                    Origin = reader.GetString(1),
+                                    Destination = reader.GetString(2),
+                                    Price = reader.GetDecimal(3),
+                                    Transport = new Transport
+                                    {
+                                        FlightCarrier = reader.GetString(4),
+                                        FlightNumber = reader.GetString(5)
+                                    }
+                                };
+                                PriceJ = reader.GetDecimal(0);
+
+                                Journey.Flights.Add(flight);
+                            }
+
+                            Journey.Origin = Origin;
+                            Journey.Destination = Destination;
+                            Journey.Price = PriceJ;
+
+                            return Journey;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("[" + Method.Name + "].  " + ex.Message);
+
+            }
+        }
+
         /// <summary>
         /// Graba las rutas encontradas
         /// </summary>
