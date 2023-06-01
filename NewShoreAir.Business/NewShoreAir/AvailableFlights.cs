@@ -10,6 +10,7 @@ using NewShoreAir.Business.Services;
 using NewShoreAir.Models.Entities;
 using System.Collections.Specialized;
 using Microsoft.Extensions.Options;
+using NewShoreAir.Models.Data;
 
 namespace NewShoreAir.Business.NewShoreAir
 {
@@ -17,9 +18,9 @@ namespace NewShoreAir.Business.NewShoreAir
     {
         SrvRecruiting _srvRecruiting;
         DalFlight _dalFlight;
-        public AvailableFlights() {
+        public AvailableFlights(IOptionsMonitor<ConnectionStrings> optionsMonitor) {
             _srvRecruiting = new SrvRecruiting();
-            _dalFlight = new DalFlight();
+            _dalFlight = new DalFlight(optionsMonitor);
         }
         /// <summary>
         /// Obtiene la ruta de los vuelos

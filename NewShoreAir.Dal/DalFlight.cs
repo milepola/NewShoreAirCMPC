@@ -3,10 +3,14 @@ using System.Data.SqlClient;
 using System.Reflection;
 using Microsoft.Extensions.Options;
 using NewShoreAir.Models.Entities;
+using NewShoreAir.Models.Data;
+
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System;
+using System.Reflection.Metadata;
+using System.Data.Common;
 
 namespace NewShoreAir.Dal
 {
@@ -14,9 +18,12 @@ namespace NewShoreAir.Dal
     {
         private readonly string _stringConnection;
 
-        public DalFlight() {
+        public DalFlight(IOptionsMonitor<ConnectionStrings> optionsMonitor) {
 
-            _stringConnection = @"Server=milepola\sqlexpress;Database=NewShoreAir;Uid=sa;Pwd=Passw0rd.";
+            //_stringConnection = @"Server=milepola\sqlexpress;Database=NewShoreAir;Uid=sa;Pwd=Passw0rd.";
+
+            var settings = optionsMonitor.CurrentValue;
+            _stringConnection = settings.NewShoreAirContext;
 
         }
         /// <summary>

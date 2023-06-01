@@ -8,11 +8,14 @@ namespace NewShoreAir.Controllers
     public class NewShoreAir : ControllerBase
     {
         private readonly ILogger<NewShoreAir> _logger;
-        private AvailableFlights _AvailableFlights = new AvailableFlights();
+        //private AvailableFlights _AvailableFlights = new AvailableFlights();
+        private readonly AvailableFlights _AvailableFlights;
 
-        public NewShoreAir(ILogger<NewShoreAir> logger)
+        public NewShoreAir(ILogger<NewShoreAir> logger, AvailableFlights AvailableFlights)
         {
             _logger = logger;
+            _AvailableFlights = AvailableFlights;
+
         }
 
         [HttpGet]
